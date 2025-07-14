@@ -31,7 +31,7 @@ def pieces_to_faces(cp: CubePieces) -> CubeFaces:
 
     # corner stickers
     for corner_num, (pos, orientation) in enumerate(cp.corners):
-        mapping = PIECES_TO_FACES_CORNERS_LOCATIONS[corner_num]
+        mapping = CORNER_FACE_MAPPINGS[corner_num]
         colors = list(CORNER_COLORS[pos])
         # Rotate the color tuple 'orientation' times
         oriented = colors[orientation:] + colors[:orientation]
@@ -40,11 +40,11 @@ def pieces_to_faces(cp: CubePieces) -> CubeFaces:
 
     # edge stickers
     for edge_num, (pos, orientation) in enumerate(cp.edges):
-        mapping = PIECES_TO_FACES_EDGES_LOCATIONS[edge_num]
+        mapping = EDGE_FACE_MAPPINGS[edge_num]
         colors = list(EDGE_COLORS[pos])
         # Rotate the color tuple if orientation == 1
         oriented = colors[orientation:] + colors[:orientation]
         for (face, loc), sticker in zip(mapping.items(), oriented):
             faces[face][loc] = sticker
-            
+
     return CubeFaces(faces)
