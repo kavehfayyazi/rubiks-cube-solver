@@ -3,18 +3,14 @@ from gui import *
 
 if __name__ == '__main__':
     test_faces = {
-        'U': ['Y', 'B', 'Y', 'O', 'Y', 'R', 'B', 'G', 'W'],
-        'D': ['W', 'R', 'G', 'W', 'W', 'Y', 'O', 'W', 'Y'],
-        'L': ['G', 'Y', 'Y', 'R', 'B', 'G', 'W', 'O', 'R'],
-        'R': ['B', 'G', 'G', 'B', 'G', 'O', 'Y', 'R', 'R'],
-        'F': ['O', 'Y', 'R', 'W', 'R', 'O', 'G', 'B', 'R'],
-        'B': ['O', 'Y', 'O', 'G', 'O', 'W', 'B', 'B', 'B']
+        'U': ['R', 'Y', 'G', 'B', 'W', 'R', 'Y', 'G', 'B'],
+        'D': ['R', 'Y', 'G', 'B', 'W', 'R', 'Y', 'G', 'B'],
+        'L': ['R', 'Y', 'G', 'B', 'W', 'R', 'Y', 'G', 'B'],
+        'R': ['R', 'Y', 'G', 'B', 'W', 'R', 'Y', 'G', 'B'],
+        'F': ['R', 'Y', 'G', 'B', 'W', 'R', 'Y', 'G', 'B'],
+        'B': ['R', 'Y', 'G', 'B', 'W', 'R', 'Y', 'G', 'B']
     }
-    app.run_app(faces.CubeFaces(test_faces))
-    # app.run_app(faces.CubeFaces())
 
-# if __name__ == '__main__':
-#     cube1 = faces.CubeFaces()
-#     cube1.print()
-#     cube2 = pieces.CubePieces()
-#     cube2.print()
+    cube = pieces.CubePieces()
+    altered_cube = cube.move("U F R B D2 L U' B2")
+    app.run_app(translator.pieces_to_faces(altered_cube))

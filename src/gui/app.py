@@ -33,6 +33,7 @@ def run_app(rubiks_cube: CubeFaces):
 
     # Transparent cube container
     cube = Entity(model="cube", update=my_update, scale=4, color=(0,0,0,0))
+    cube.rotation = (-25, 25, 0)
 
     # Cube face entities
     face_list = {
@@ -69,7 +70,7 @@ def run_app(rubiks_cube: CubeFaces):
 
     # Create stickers on each face
     for key, value in rubiks_cube.faces.items():
-        face = face_list.get(key)
+        face = face_list[key]
         for i, sticker_color in enumerate(value):
             Entity(
                 parent=face, 

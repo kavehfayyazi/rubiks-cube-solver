@@ -1,4 +1,6 @@
 class CubeFaces:
+    """A 3x3 Rubik's Cube state as length9 lists of sticker colors in row-major order"""
+
     def __init__(self, faces = None):
         if faces is not None:
             self.faces = faces
@@ -11,7 +13,6 @@ class CubeFaces:
               'F': ['R' for _ in range(3)] * 3,
               'B': ['O' for _ in range(3)] * 3,
             }
-    
-    def print(self):
-        for key, value in self.faces.items():
-            print(f"{key}: {value}")
+            
+    def __repr__(self):
+        return f"<CubeFaces faces={self.faces}>"

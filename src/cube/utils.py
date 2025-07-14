@@ -1,3 +1,5 @@
+from .tables import *
+
 # Rotates the elements at indices in big_list forward by n.
 # Returns a new list.
 
@@ -13,16 +15,16 @@ def rotate_sublist(big_list, indices, n):
 def switch_pieces(move_table, piece_list, move):
         if move in move_table:
             n = 2 if move.endswith('2') else 3 if move.endswith('\'') else 1
-            piece_list = rotate_sublist(piece_list, move_table.get(move), n)
+            piece_list[:] = rotate_sublist(piece_list, move_table[move], n)
 
-def orient_corners(move_table, corner_list, move):
-    if move in move_table:
-        for idx, corner_idx in enumerate(move_table.get(move)):
+def orient_corners(corner_list, move):
+    if move in FLIP_CORNERS_TABLE:
+        for idx, corner_idx in enumerate(FLIP_CORNERS_TABLE[move]):
             pos, orientation = corner_list[corner_idx]
             corner_list[corner_idx] = (pos, (orientation + 1) % 3) if idx % 2 == 0 else (pos, (orientation + 2) % 3)
 
-def orient_edges(move_table, edge_list, move):
-    if move in move_table:
-        for edge_idx in move_table.get(move):
-            pos, orientation = edge_list[edge_idx]
-            edge_list[edge_idx] = (pos, 0 if orientation == 1 else 1)
+def orient_edges(edge_list, move):
+    if move in FLIP_EDGES_TABLE:
+        for edge_idx, (pos, orientation) in enumerate(edge_list):
+            if edge_idx in SWITCH_EDGES_TABLE[move] and edge_idx in FLIP_EDGES_TABLE[move]:
+                edge_list[edge_idx] = (pos, 0 if orientation == 1 else 1)
