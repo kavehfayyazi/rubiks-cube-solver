@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-.venv
-=======
 .venv
 __pycache__/
 *.py[cod]
->>>>>>> 8ce5faf (Implemented faces representation of the cube)
+**/.DS_Store

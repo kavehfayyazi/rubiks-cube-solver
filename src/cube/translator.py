@@ -10,12 +10,16 @@ Public API:
 
 from .pieces import CubePieces
 from .faces import CubeFaces
-from .utils import *
+from .tables import (
+    FACE_COLORS, 
+    CORNER_FACE_MAPPINGS, 
+    CORNER_COLORS, 
+    EDGE_FACE_MAPPINGS, 
+    EDGE_COLORS,
+)
 
 def pieces_to_faces(cp: CubePieces) -> CubeFaces:
-    """
-    Lays out all stickers from a piece-oriented cube 
-    into 3x3 (length-9) face arrays.
+    """Lays out all stickers from a piece-oriented cube into 3x3 (length-9) face arrays.
 
     Args:
         cp (CubePieces): (position + orientation tuple lists)
