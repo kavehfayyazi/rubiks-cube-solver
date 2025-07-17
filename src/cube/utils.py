@@ -57,7 +57,7 @@ def orient_corners(corner_list: list, move: str):
     if move in CORNER_ORIENTATION_CYCLES:
         for idx, corner_idx in enumerate(CORNER_ORIENTATION_CYCLES[move]):
             pos, orientation = corner_list[corner_idx]
-            corner_list[corner_idx] = (pos, (orientation + 1) % 3) if idx % 2 == 0 else (pos, (orientation + 2) % 3)
+            corner_list[corner_idx] = (pos, (orientation + 1) % 3) if idx % 2 == 1 else (pos, (orientation + 2) % 3)
 
 def orient_edges(edge_list: list, move: str):
     """Updates orientation of edges in edge_list inplace according to move
@@ -70,3 +70,12 @@ def orient_edges(edge_list: list, move: str):
         for edge_idx, (pos, orientation) in enumerate(edge_list):
             if edge_idx in EDGE_PERMUTATIONS[move] and edge_idx in EDGE_ORIENTATION_CYCLES[move]:
                 edge_list[edge_idx] = (pos, 0 if orientation == 1 else 1)
+
+def find_rotation_offset(list, reference):
+    """Returns how many forward direction rotations of list to equal reference, 
+       else -1 if no match."""
+    for n in range(len(list)):
+        # rotate via slicing
+        if list[-n:] + list[:-n] == reference:
+            return n
+    return -1
