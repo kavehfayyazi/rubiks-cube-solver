@@ -18,7 +18,7 @@ from .tables import (
 )
 
 def rotate_sublist(big_list: list, indices: list, n: int) -> list:
-    """Rotates the indices sublist of big_list by n in a forward direction and returns a copy
+    """Rotates the indices sublist of big_list by n in a forward direction and returns a copy.
 
     Args: 
         big_list (list): The original list.
@@ -36,7 +36,7 @@ def rotate_sublist(big_list: list, indices: list, n: int) -> list:
     return result
 
 def switch_pieces(move_table: dict[str, tuple[int, ...]], piece_list: list, move: str):
-    """Utilizes rotate_sublist to rotate the piece_list indices according to the move performed
+    """Utilizes rotate_sublist to rotate the piece_list indices according to the move performed.
 
     Args:
         move_table (dict[str, tuple[int, ...]]): Maps face-turns to index tuples.
@@ -47,29 +47,30 @@ def switch_pieces(move_table: dict[str, tuple[int, ...]], piece_list: list, move
         n = 2 if move.endswith('2') else 3 if move.endswith('\'') else 1
         piece_list[:] = rotate_sublist(piece_list, move_table[move], n)
 
-def orient_corners(corner_list: list, move: str):
-    """Updates orientation of corners in corner_list inplace according to move
+def orient_corners(corner_orientation_list: list, move: str):
+    """Updates orientation of corners in corner_orientation_list inplace according to 'move'.
 
     Args:
-        corner_list (list): The list of '(corner_id, orientation)' corner tuples
+        corner_orientation_list (list): The list of orientations.
         move (str): A face-turn string.
     """
     if move in CORNER_ORIENTATION_CYCLES:
         for idx, corner_idx in enumerate(CORNER_ORIENTATION_CYCLES[move]):
-            pos, orientation = corner_list[corner_idx]
-            corner_list[corner_idx] = (pos, (orientation + 1) % 3) if idx % 2 == 1 else (pos, (orientation + 2) % 3)
+            print(len(corner_orientation_list), corner_idx, CORNER_ORIENTATION_CYCLES[move])
+            ori = corner_orientation_list[corner_idx]
+            corner_orientation_list[corner_idx] = (ori + 1) % 3 if idx % 2 == 1 else (ori + 2) % 3
 
-def orient_edges(edge_list: list, move: str):
-    """Updates orientation of edges in edge_list inplace according to move
+def orient_edges(edge_orientation_list: list, move: str):
+    """Updates orientation of edges in edge_orientation_list inplace according to 'move'.
 
     Args:
-        edge_list (list): The list of '(edge_id, orientation)' edge tuples
+        edge_orientation_list (list): The list of orientations.
         move (str): A face-turn string.
     """
     if move in EDGE_ORIENTATION_CYCLES:
-        for edge_idx, (pos, orientation) in enumerate(edge_list):
+        for edge_idx, ori in enumerate(edge_orientation_list):
             if edge_idx in EDGE_PERMUTATIONS[move] and edge_idx in EDGE_ORIENTATION_CYCLES[move]:
-                edge_list[edge_idx] = (pos, 0 if orientation == 1 else 1)
+                edge_orientation_list[edge_idx] = 1 - ori
 
 def find_rotation_offset(list, reference):
     """Returns how many forward direction rotations of list to equal reference, 
