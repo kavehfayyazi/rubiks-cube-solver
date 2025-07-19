@@ -29,6 +29,9 @@ class CubeFaces:
               'B': ['O' for _ in range(3)] * 3,
             }
 
+    def return_faces(self):
+        return self.faces
+
     def __repr__(self):
         """Unambiguous representation for debugging"""
         return f"<CubeFaces faces={self.faces}>"

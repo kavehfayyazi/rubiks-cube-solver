@@ -1,6 +1,9 @@
 from .utils import switch_pieces, orient_corners, orient_edges
 from .tables import CORNER_PERMUTATIONS, EDGE_PERMUTATIONS
 
+def tuple_to_cube(tuple):
+    return CubePieces(tuple[0], tuple[1])
+
 class CubePieces:
     """A 3x3 Rubik's Cube state as a tuple of corner positions and a tuple of orientations respectively. 
     
@@ -32,7 +35,7 @@ class CubePieces:
         self.corners = tuple(range(8)), (0,) * 8
         self.edges = tuple(range(12)), (0,) * 12
     
-    def apply_move_inplace(self, move: str) -> "CubePieces":
+    def apply_move_inplace(self, move: str) -> None:
         """Apply exactly one face move (e.g. "U" or "R'" or "F2") to self.
         
         This mutates self.corners and self.edges without making a new object.
@@ -74,8 +77,8 @@ class CubePieces:
             A new CubePieces instance with all moves applied in left-to-right order. 
         """
         # copy the pieces-lists of self
-        new_corners = tuple(list(self.corners))
-        new_edges   = tuple(list(self.edges))
+        new_corners = (self.corners[0], self.corners[1])
+        new_edges = (self.edges[0], self.edges[1])
 
         cube = CubePieces(new_corners, new_edges)
         for m in moves.strip().split():
@@ -83,7 +86,13 @@ class CubePieces:
         return cube
     
     def is_solved(self):
-        return self.corners == tuple(range(8)), (0,) and self.edges == tuple(range(12)), (0,) * 12
+        print(self.corners)
+        print((tuple(range(8)), (0,) * 8))
+        return (
+            self.corners == (tuple(range(8)), (0,) * 8)
+            and 
+            self.edges == (tuple(range(12)), (0,) * 12)
+        )
 
     def return_pieces(self):
         return (self.corners, self.edges)

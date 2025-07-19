@@ -56,7 +56,6 @@ def orient_corners(corner_orientation_list: list, move: str):
     """
     if move in CORNER_ORIENTATION_CYCLES:
         for idx, corner_idx in enumerate(CORNER_ORIENTATION_CYCLES[move]):
-            print(len(corner_orientation_list), corner_idx, CORNER_ORIENTATION_CYCLES[move])
             ori = corner_orientation_list[corner_idx]
             corner_orientation_list[corner_idx] = (ori + 1) % 3 if idx % 2 == 1 else (ori + 2) % 3
 
