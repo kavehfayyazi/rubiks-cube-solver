@@ -1,5 +1,5 @@
 import pytest
-from src.cube.pieces import CubePieces, tuple_to_cube
+from src.cube.pieces import CubePieces, pieces_to_cube
 from src.cube.faces import CubeFaces
 from src.cube.translator import faces_to_pieces, pieces_to_faces
 
@@ -99,4 +99,4 @@ def test_pieces():
     assert pieces_single.is_solved()
 
     pieces_misc = CubePieces()
-    assert tuple_to_cube(pieces_misc.return_pieces()).is_solved()
+    assert pieces_to_cube(pieces_misc.return_pieces()).is_solved()
