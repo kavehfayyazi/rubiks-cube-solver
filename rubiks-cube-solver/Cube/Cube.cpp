@@ -9,6 +9,7 @@
 #include "bitUtils.h"
 #include <string>
 #include <stdexcept>
+#include <sstream>
 
 void Cube::switch_pieces(PieceType pieceType, PiecePart piecePart, uint64_t* state, std::array<unsigned char, 4> idxList, unsigned char rot) const {
     size_t i;
@@ -78,6 +79,37 @@ void Cube::orient_edges(uint64_t* state, Move move) const {
     }
 }
 
+Cube Cube::parseMoves(std::string moves, const uint64_t* cornerState, const uint64_t* edgeState) const {
+    std::stringstream s(moves);
+    std::string move;
+    uint64_t newCornerState = *cornerState;
+    uint64_t newEdgeState = *edgeState;
+    while(s >> move){
+        auto it = STRING_TO_MOVE.find(move);
+        if(it != STRING_TO_MOVE.end()) singleMove(STRING_TO_MOVE.at(move), &newCornerState, &newEdgeState);
+        else throw std::invalid_argument("Invalid mvoe argument.");
+    }
+    return Cube(newCornerState, newEdgeState);
+}
+
+void Cube::singleMove(Move move, uint64_t* cornerState, uint64_t* edgeState) const {
+    unsigned char num_rot = 0;
+    
+    if(static_cast<int>(move) % 3 == 0) {num_rot = 1;}
+    else if(static_cast<int>(move) % 3 == 1) {num_rot = 2;}
+    else {num_rot = 3;} // (static_cast<int>(move) % 3 == 2)
+    
+    // Permute corner and edge pieces (pos + ori)
+    switch_pieces(PieceType::Corner, PiecePart::Position, cornerState, CORNER_POS_PERMED.at(move), num_rot);
+    switch_pieces(PieceType::Corner, PiecePart::Orientation, cornerState, CORNER_POS_PERMED.at(move), num_rot);
+    switch_pieces(PieceType::Edge, PiecePart::Position, edgeState, EDGE_POS_PERMED.at(move), num_rot);
+    switch_pieces(PieceType::Edge, PiecePart::Orientation, edgeState, EDGE_POS_PERMED.at(move), num_rot);
+    
+    // Orient
+    orient_corners(cornerState, move);
+    orient_edges(edgeState, move);
+}
+
 Cube::Cube()
 : cornerState([&] {
     uint64_t cornerState = 0;
@@ -121,44 +153,39 @@ unsigned char Cube::getState(PieceType pieceType, PiecePart piecePart, const uin
 
 void Cube::setState(PieceType pieceType, PiecePart piecePart, uint64_t* state, unsigned char idx, unsigned char value) const {
     size_t bit_pos;
+    unsigned char num_bits;
+    
     switch(pieceType) {
         case PieceType::Corner:
             switch(piecePart){
-                case PiecePart::Position:       bit_pos = TOTAL_CORNER_ORI_BITS + idx * CORNER_POS_BITS;    break;
-                case PiecePart::Orientation:    bit_pos = idx * CORNER_POS_BITS;                            break;
+                case PiecePart::Position:
+                    bit_pos = TOTAL_CORNER_ORI_BITS + idx * CORNER_POS_BITS;
+                    num_bits = CORNER_POS_BITS;
+                    break;
+                case PiecePart::Orientation:
+                    bit_pos = idx * CORNER_ORI_BITS;
+                    num_bits = CORNER_ORI_BITS;
+                    break;
             }
             break;
         case PieceType::Edge:
             switch(piecePart){
-                case PiecePart::Position:       bit_pos = TOTAL_EDGE_ORI_BITS + idx * EDGE_POS_BITS;        break;
-                case PiecePart::Orientation:    bit_pos = idx * EDGE_ORI_BITS;                              break;
+                case PiecePart::Position:
+                    bit_pos = TOTAL_EDGE_ORI_BITS + idx * EDGE_POS_BITS;
+                    num_bits = EDGE_POS_BITS;
+                    break;
+                case PiecePart::Orientation:
+                    bit_pos = idx * EDGE_ORI_BITS;
+                    num_bits = EDGE_ORI_BITS;
+                    break;
             }
     }
-    *state &= ~(uint64_t(0b111) << bit_pos);
-    *state |= (uint64_t(value & 0b111) << bit_pos);
+    *state &= ~((uint64_t((1 << num_bits) - 1)) << bit_pos);
+    *state |= ((uint64_t(value & ((1 << num_bits) - 1))) << bit_pos);
 }
 
-Cube Cube::move(Move move) const {
-    unsigned char num_rot = 0;
-    
-    if(static_cast<int>(move) % 3 == 0) {num_rot = 1;}
-    else if(static_cast<int>(move) % 3 == 1) {num_rot = 2;}
-    else {num_rot = 3;} // (static_cast<int>(move) % 3 == 2)
-    
-    uint64_t newCornerState = getCornerState();
-    uint64_t newEdgeState = getEdgeState();
-    
-    // Permute corner and edge pieces (pos + ori)
-    switch_pieces(PieceType::Corner, PiecePart::Position, &newCornerState, CORNER_POS_PERMED.at(move), num_rot);
-    switch_pieces(PieceType::Corner, PiecePart::Orientation, &newCornerState, CORNER_POS_PERMED.at(move), num_rot);
-    switch_pieces(PieceType::Edge, PiecePart::Position, &newEdgeState, EDGE_POS_PERMED.at(move), num_rot);
-    switch_pieces(PieceType::Edge, PiecePart::Orientation, &newEdgeState, EDGE_POS_PERMED.at(move), num_rot);
-    
-    // Orient
-    orient_corners(&newCornerState, move);
-    orient_edges(&newEdgeState, move);
-    
-    return Cube(newCornerState, newEdgeState);
+Cube Cube::move(std::string moves) const {
+    return parseMoves(moves, &cornerState, &edgeState);
 }
 
 // Corner i (pos, ori) = x, y
@@ -190,9 +217,21 @@ void Cube::printEdgeState(const uint64_t* state) const {
     }
 }
 
-void Cube::printState() const{
+void Cube::printState() const {
     printCornerState(&cornerState);
     printEdgeState(&edgeState);
+}
+
+bool Cube::is_solved() const {
+    uint64_t solvedCornerState = 0;
+    for(size_t i = 0; i < NUM_CORNERS; i++){
+        solvedCornerState |= (uint64_t)i << (CORNER_ORI_BITS * NUM_CORNERS + CORNER_POS_BITS * i);
+    }
+    uint64_t solvedEdgeState = 0;
+    for(size_t i = 0; i < NUM_EDGES; i++){
+        solvedEdgeState |= (uint64_t)i << (EDGE_ORI_BITS * NUM_EDGES + EDGE_POS_BITS * i);
+    }
+    return cornerState == solvedCornerState && edgeState == solvedEdgeState;
 }
 
 bool Cube::operator==(const Cube& other) const {
