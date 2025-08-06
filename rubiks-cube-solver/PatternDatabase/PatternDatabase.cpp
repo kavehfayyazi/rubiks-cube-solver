@@ -6,6 +6,7 @@
 //
 
 #include "PatternDatabase.h"
+//#include "PDBFileHandler.h"
 #include <fstream>
 #include <stdexcept>
 #include <iostream>

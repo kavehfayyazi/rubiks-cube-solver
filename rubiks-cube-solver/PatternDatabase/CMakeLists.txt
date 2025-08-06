@@ -9,3 +9,8 @@ target_link_libraries(PatternDatabase
         Tables
         Cube
 )
+
+target_compile_definitions(PatternDatabase
+        PUBLIC
+        PDB_DIR=\"${CMAKE_SOURCE_DIR}/PatternDatabase/PDBs\"
+)
