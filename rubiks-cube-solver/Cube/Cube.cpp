@@ -6,10 +6,17 @@
 //
 
 #include "Cube.h"
-#include "bitUtils.h"
 #include <string>
 #include <stdexcept>
 #include <sstream>
+#include <iostream>
+
+void printBits(uint64_t val) {
+    for (int i = 63; i >= 0; --i) {
+        std::cout << ((val >> i) & 1);
+    }
+    std::cout << "\n";
+}
 
 void Cube::switch_pieces(PieceType pieceType, PiecePart piecePart, uint64_t* state, std::array<unsigned char, 4> idxList, unsigned char rot) const {
     size_t i;
