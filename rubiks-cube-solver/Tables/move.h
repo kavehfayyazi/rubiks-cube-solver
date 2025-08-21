@@ -17,6 +17,7 @@ enum Move : unsigned char {
     R=9, R2=10, R_PRIME=11,
     F=12, F2=13, F_PRIME=14,
     B=15, B2=16, B_PRIME=17,
+    MOVE_N=18 // Sentinel value
 };
 
 const std::unordered_map<std::string, Move> STRING_TO_MOVE {
@@ -38,6 +39,27 @@ const std::unordered_map<std::string, Move> STRING_TO_MOVE {
     {"B",   Move::B},
     {"B'",  Move::B_PRIME},
     {"B2",  Move::B2},
+};
+
+const std::unordered_map<int, std::string> CODE_TO_MOVE_STRING {
+    {0, "U"},
+    {1, "U'"},
+    {2, "U2"},
+    {3, "D"},
+    {4, "D'"},
+    {5, "D2"},
+    {6, "L"},
+    {7, "L'"},
+    {8, "L2"},
+    {9, "R"},
+    {10, "R'"},
+    {11, "R2"},
+    {12, "F"},
+    {13, "F'"},
+    {14, "F2"},
+    {15, "B"},
+    {16, "B'"},
+    {17, "B2"},
 };
 
 

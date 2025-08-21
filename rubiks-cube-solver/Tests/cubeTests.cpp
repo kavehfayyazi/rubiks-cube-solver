@@ -1,12 +1,11 @@
 
 //
-//  mainTests.cpp
+//  cubeTests.cpp
 //  rubiks-cube-solver
 //
 //  Created by Kaveh Fayyazi on 7/29/25.
 //
 
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
 #include "Cube.h"
@@ -105,4 +104,3 @@ TEST_CASE("Cube with each turn for a single face is solved") {
     REQUIRE(cube.move("B B' B' B B2 B2").is_solved());
     REQUIRE(cube.move("B B' B' B B2 B2").is_solved());
 }
-

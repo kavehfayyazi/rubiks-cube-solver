@@ -5,15 +5,15 @@
 //  Created by Kaveh Fayyazi on 7/25/25.
 //
 
-#ifndef CUBE_H
-#define CUBE_H
+#ifndef RUBIKS_CUBE_SOLVER_CUBE_H
+#define RUBIKS_CUBE_SOLVER_CUBE_H
 
 #include "moveTables.h"
 #include "pieceClassification.h"
 #include <array>
 #include <string>
 #include <cstdint>
-#include <stddef.h>
+#include <cstddef>
 
 class Cube {
 private:
@@ -29,6 +29,7 @@ private:
 public:
     Cube(); // Default constructor initalizes solved state
     Cube(uint64_t cornerState, uint64_t edgeState);
+    std::string genScramble(int n) const;
     
     uint64_t getCornerState() const;
     uint64_t getEdgeState() const;
@@ -49,12 +50,12 @@ private:
     static constexpr unsigned char NUM_CORNERS = 8;
     static constexpr unsigned char CORNER_POS_BITS = 3;
     static constexpr unsigned char CORNER_ORI_BITS = 2;
-    static constexpr unsigned char TOTAL_CORNER_ORI_BITS = NUM_CORNERS & CORNER_ORI_BITS;
+    static constexpr unsigned char TOTAL_CORNER_ORI_BITS = NUM_CORNERS * CORNER_ORI_BITS;
     
     static constexpr unsigned char NUM_EDGES = 12;
     static constexpr unsigned char EDGE_POS_BITS = 4;
     static constexpr unsigned char EDGE_ORI_BITS = 1;
-    static constexpr unsigned char TOTAL_EDGE_ORI_BITS = NUM_EDGES & EDGE_ORI_BITS;
+    static constexpr unsigned char TOTAL_EDGE_ORI_BITS = NUM_EDGES * EDGE_ORI_BITS;
 };
 
 #endif

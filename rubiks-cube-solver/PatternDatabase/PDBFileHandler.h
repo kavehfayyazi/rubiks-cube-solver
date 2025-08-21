@@ -17,9 +17,14 @@ namespace fs = std::filesystem;
 
 class PDBFileHandler {
 public:
-    PDBFileHandler(const std::string& filename){
+    static fs::path getFilePath(const std::string& filename) {
         std::string cwd(PDB_DIR);
         fs::path filePath = cwd + "/" + filename;
+        return filePath;
+    }
+
+    PDBFileHandler(const std::string& filename) {
+        fs::path filePath = getFilePath(filename);
         file.open(filePath, std::ios::in | std::ios::binary);
         if(!file.is_open()) throw std::runtime_error("Cannot open file: " + filePath.string());
 
@@ -41,8 +46,10 @@ public:
     }
 
     uint8_t search(size_t idx) const {
-        return pdb.at(idx);
+        if (idx & 1) return (pdb[idx / 2] >> 4) & 0xF;
+        else return pdb[idx / 2] & 0xF;
     }
+
 private:
     std::ifstream file;
     std::vector<uint8_t> pdb;

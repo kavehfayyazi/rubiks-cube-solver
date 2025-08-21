@@ -60,9 +60,9 @@ const std::unordered_map<Move, std::array<unsigned char, 4>> EDGE_POS_PERMED = {
     {Move::B2, {2, 11, 6, 10}},
 };
 
-const std::unordered_map<Move, std::array<unsigned char, 12>> EDGE_POS_ORIENTED = {
-    {Move::L, {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}},
-    {Move::L_PRIME, {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}},
-    {Move::R, {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}},
-    {Move::R_PRIME, {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}},
+const std::unordered_map<Move, std::array<unsigned char, 4>> EDGE_POS_ORIENTED = {
+        {Move::F,      {0, 9, 4, 8}},   // UF, FR, DF, FL
+        {Move::F_PRIME,{0, 9, 4, 8}},
+        {Move::B,      {2,11, 6,10}},   // UB, BR, DB, BL
+        {Move::B_PRIME,{2,11, 6,10}},
 };

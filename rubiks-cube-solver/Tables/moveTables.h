@@ -16,6 +16,6 @@ extern const std::unordered_map<Move, std::array<unsigned char, 4>> CORNER_POS_P
 extern const std::unordered_map<Move, std::array<unsigned char, 4>> CORNER_POS_ORIENTED;
 
 extern const std::unordered_map<Move, std::array<unsigned char, 4>> EDGE_POS_PERMED;
-extern const std::unordered_map<Move, std::array<unsigned char, 12>> EDGE_POS_ORIENTED;
+extern const std::unordered_map<Move, std::array<unsigned char, 4>> EDGE_POS_ORIENTED;
 
 #endif
