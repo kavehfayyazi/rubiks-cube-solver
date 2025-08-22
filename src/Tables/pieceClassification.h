@@ -1,6 +1,6 @@
 //
 //  pieceClassification.h
-//  rubiks-cube-solver
+//  src
 //
 //  Created by Kaveh Fayyazi on 7/27/25.
 //

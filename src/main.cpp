@@ -1,6 +1,6 @@
 //////
 //////  main.cpp
-//////  rubiks-cube-solver
+//////  src
 //////
 //////  Created by Kaveh Fayyazi on 7/25/25.
 //////
@@ -23,7 +23,7 @@
 //
 ////
 ////  CubeTests.cpp
-////  rubiks-cube-solver
+////  src
 ////
 ////  Created by Kaveh Fayyazi on 7/29/25.
 ////
@@ -181,6 +181,7 @@
 //    return 0;
 //}
 
+#include "IDAStar.h"
 #include "PatternDatabase.h"
 #include "PDBFileHandler.h"
 
@@ -193,6 +194,10 @@
 #include <string>
 
 int main() {
-    Cube c = Cube();
-    std::cout << c.genScramble(2);
+    Cube c;
+    const auto scramble = c.genScramble(5);
+    Cube scrambled = c.move(scramble);
+    std::vector<Move> movePath{};
+    IDAStar().solve(scrambled, movePath);
+
 }

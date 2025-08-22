@@ -1,6 +1,6 @@
 //
 //  IDAStar.h
-//  rubiks-cube-solver
+//  src
 //
 //  Created by Kaveh Fayyazi on 8/4/25.
 //

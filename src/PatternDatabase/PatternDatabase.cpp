@@ -1,6 +1,6 @@
 //
 //  PatternDatabase.cpp
-//  rubiks-cube-solver
+//  src
 //
 //  Created by Kaveh Fayyazi on 7/30/25.
 //

@@ -1,6 +1,6 @@
 //
 //  tables.cpp
-//  rubiks-cube-solver
+//  src
 //
 //  Created by Kaveh Fayyazi on 7/26/25.
 //
