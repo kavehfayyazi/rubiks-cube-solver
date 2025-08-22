@@ -5,14 +5,17 @@
 //  Created by Kaveh Fayyazi on 7/30/25.
 //
 
+#ifndef RUBIKS_CUBE_SOLVER_PATTERNDATABASE_H
+#define RUBIKS_CUBE_SOLVER_PATTERNDATABASE_H
+
 #include "pieceClassification.h"
 #include "Cube.h"
+#include <cstddef>
 #include <vector>
 #include <optional>
 #include <atomic>
 #include <array>
 #include <cstdint>
-#include <cstddef>
 
 class PatternDatabase {
 private:
@@ -59,3 +62,5 @@ public:
     std::array<unsigned char, 6> edgesFirstHalf = {0,1,2,3,8,9};
     std::array<unsigned char, 6> edgesSecondHalf = {4,5,6,7,10,11};
 };
+
+#endif

@@ -17,25 +17,26 @@ TEST_CASE("Cube default state is solved") {
 
 TEST_CASE("Cube after one turn is not solved") {
     Cube cube;
-    REQUIRE(!cube.move("U").is_solved());
-    REQUIRE(!cube.move("U").is_solved());
-    REQUIRE(!cube.move("U2").is_solved());
-    REQUIRE(!cube.move("D").is_solved());
-    REQUIRE(!cube.move("D").is_solved());
-    REQUIRE(!cube.move("D2").is_solved());
-    REQUIRE(!cube.move("L").is_solved());
-    REQUIRE(!cube.move("L").is_solved());
-    REQUIRE(!cube.move("L2").is_solved());
-    REQUIRE(!cube.move("R").is_solved());
-    REQUIRE(!cube.move("R").is_solved());
-    REQUIRE(!cube.move("R2").is_solved());
-    REQUIRE(!cube.move("F").is_solved());
-    REQUIRE(!cube.move("F").is_solved());
-    REQUIRE(!cube.move("F2").is_solved());
-    REQUIRE(!cube.move("B").is_solved());
-    REQUIRE(!cube.move("B").is_solved());
-    REQUIRE(!cube.move("B2").is_solved());
+    REQUIRE_FALSE(cube.move("U").is_solved());
+    REQUIRE_FALSE(cube.move("U").is_solved());
+    REQUIRE_FALSE(cube.move("U2").is_solved());
+    REQUIRE_FALSE(cube.move("D").is_solved());
+    REQUIRE_FALSE(cube.move("D").is_solved());
+    REQUIRE_FALSE(cube.move("D2").is_solved());
+    REQUIRE_FALSE(cube.move("L").is_solved());
+    REQUIRE_FALSE(cube.move("L").is_solved());
+    REQUIRE_FALSE(cube.move("L2").is_solved());
+    REQUIRE_FALSE(cube.move("R").is_solved());
+    REQUIRE_FALSE(cube.move("R").is_solved());
+    REQUIRE_FALSE(cube.move("R2").is_solved());
+    REQUIRE_FALSE(cube.move("F").is_solved());
+    REQUIRE_FALSE(cube.move("F").is_solved());
+    REQUIRE_FALSE(cube.move("F2").is_solved());
+    REQUIRE_FALSE(cube.move("B").is_solved());
+    REQUIRE_FALSE(cube.move("B").is_solved());
+    REQUIRE_FALSE(cube.move("B2").is_solved());
 }
+
 
 TEST_CASE("Cube after one turn and its inverse is solved") {
     Cube cube;

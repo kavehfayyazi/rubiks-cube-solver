@@ -5,8 +5,8 @@
 //  Created by Kaveh Fayyazi on 7/26/25.
 //
 
-#ifndef MOVETABLES_H
-#define MOVETABLES_H
+#ifndef RUBIKS_CUBE_SOLVER_MOVETABLES_H
+#define RUBIKS_CUBE_SOLVER_MOVETABLES_H
 
 #include "move.h"
 #include <unordered_map>

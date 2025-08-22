@@ -138,9 +138,8 @@ edgeState([&] {
 }())
 {}
 
+Cube::Cube(uint64_t cornerState, uint64_t edgeState) : cornerState(cornerState), edgeState(edgeState) {}
 
-Cube::Cube(uint64_t cornerState, uint64_t edgeState)
-: cornerState(cornerState) , edgeState(edgeState) {}
 
 std::string Cube::genScramble(int n) const {
     if (n == 0) return "";
@@ -149,8 +148,8 @@ std::string Cube::genScramble(int n) const {
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dist(0, MOVE_N - 1);
 
+    int prevMoveType = -1;
     for (int i = 0; i < n; i++) {
-        int prevMoveType = -1;
         int moveType;
         int move;
         while (true) {
@@ -259,17 +258,7 @@ void Cube::printState() const {
 
 }
 
-bool Cube::is_solved() const {
-    uint64_t solvedCornerState = 0;
-    for(size_t i = 0; i < NUM_CORNERS; i++){
-        solvedCornerState |= (uint64_t)i << (TOTAL_CORNER_ORI_BITS + CORNER_POS_BITS * i);
-    }
-    uint64_t solvedEdgeState = 0;
-    for(size_t i = 0; i < NUM_EDGES; i++){
-        solvedEdgeState |= (uint64_t)i << (TOTAL_EDGE_ORI_BITS + EDGE_POS_BITS * i);
-    }
-    return cornerState == solvedCornerState && edgeState == solvedEdgeState;
-}
+bool Cube::is_solved() const { return cornerState == solvedCornerState && edgeState == solvedEdgeState; }
 
 bool Cube::operator==(const Cube& other) const {
     return

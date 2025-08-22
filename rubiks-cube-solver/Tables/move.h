@@ -20,6 +20,8 @@ enum Move : unsigned char {
     MOVE_N=18 // Sentinel value
 };
 
+auto face = [](Move m) { return static_cast<int>(m) / 3; };
+
 const std::unordered_map<std::string, Move> STRING_TO_MOVE {
     {"U",   Move::U},
     {"U'",  Move::U_PRIME},

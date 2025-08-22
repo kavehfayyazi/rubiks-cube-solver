@@ -29,6 +29,7 @@ private:
 public:
     Cube(); // Default constructor initalizes solved state
     Cube(uint64_t cornerState, uint64_t edgeState);
+
     std::string genScramble(int n) const;
     
     uint64_t getCornerState() const;
@@ -44,18 +45,36 @@ public:
     void printState() const;
     
     bool is_solved() const;
-    
+
     bool operator==(const Cube& other) const;
 private:
     static constexpr unsigned char NUM_CORNERS = 8;
     static constexpr unsigned char CORNER_POS_BITS = 3;
     static constexpr unsigned char CORNER_ORI_BITS = 2;
     static constexpr unsigned char TOTAL_CORNER_ORI_BITS = NUM_CORNERS * CORNER_ORI_BITS;
-    
+
     static constexpr unsigned char NUM_EDGES = 12;
     static constexpr unsigned char EDGE_POS_BITS = 4;
     static constexpr unsigned char EDGE_ORI_BITS = 1;
     static constexpr unsigned char TOTAL_EDGE_ORI_BITS = NUM_EDGES * EDGE_ORI_BITS;
+
+    inline static constexpr uint64_t solvedCornerState = [] {
+        uint64_t s = 0;
+        for (unsigned i = 0; i < NUM_CORNERS; ++i) {
+            unsigned shift = TOTAL_CORNER_ORI_BITS + CORNER_POS_BITS * i;
+            s |= (uint64_t{i} << shift);
+        }
+        return s;
+    }();
+
+    inline static constexpr uint64_t solvedEdgeState = [] {
+        uint64_t s = 0;
+        for (unsigned i = 0; i < NUM_EDGES; ++i) {
+            unsigned shift = TOTAL_EDGE_ORI_BITS + EDGE_POS_BITS * i;
+            s |= (uint64_t{i} << shift);
+        }
+        return s;
+    }();
 };
 
 #endif

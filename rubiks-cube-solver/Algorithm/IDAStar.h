@@ -9,7 +9,10 @@
 #define IDASTAR_H
 
 #include "Cube.h"
+#include "PatternDatabase.h"
+#include "PDBFileHandler.h"
 #include <vector>
+#include <array>
 
 struct Result {
     bool found;
@@ -18,12 +21,19 @@ struct Result {
 
 class IDAStar {
 private:
-    size_t calculateHeuristic(Cube c);
-    std::vector<Cube> getSuccessors(Cube c);
-    Result search(std::vector<Cube>& searchPath, size_t g, size_t bound);
+    size_t calculateHeuristic(const Cube& c) const;
+    static void getSuccessors(const Cube& c, std::vector<Cube>& successors);
+    Result search(std::vector<Cube>& searchPath, std::vector<Move>& movePath, size_t g, size_t bound) const;
 
 public:
-    bool solve(Cube root, std::vector<Cube>& solutionPath);
+    IDAStar();
+    bool solve(Cube root, std::vector<Move>& moveSolution) const;
+
+private:
+    PatternDatabase pdb;
+    PDBFileHandler corner;
+    PDBFileHandler edge_start;
+    PDBFileHandler edge_end;
 };
 
 #endif
