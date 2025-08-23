@@ -39,6 +39,7 @@ public:
     void setState(PieceType pieceType, PiecePart piecePart, uint64_t& state, unsigned char idx, unsigned char value) const;
     
     Cube move(std::string moves) const;
+    Cube move(Move move) const;
     
     void printCornerState(const uint64_t& cornerState) const;
     void printEdgeState(const uint64_t& edgeState) const;

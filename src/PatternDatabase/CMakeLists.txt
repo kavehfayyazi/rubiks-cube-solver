@@ -12,5 +12,5 @@ target_link_libraries(PatternDatabase
 
 target_compile_definitions(PatternDatabase
         PUBLIC
-        PDB_DIR=\"${CMAKE_SOURCE_DIR}/PatternDatabase/PDBs\"
+        PDB_DIR=\"${CMAKE_SOURCE_DIR}/src/PatternDatabase/PDBs\"
 )

@@ -26,6 +26,7 @@ private:
     Result search(std::vector<Cube>& searchPath, std::vector<Move>& movePath, size_t g, size_t bound) const;
 
 public:
+    static void condenseMoves(std::vector<Move>& movePath);
     IDAStar();
     bool solve(Cube root, std::vector<Move>& moveSolution) const;
 

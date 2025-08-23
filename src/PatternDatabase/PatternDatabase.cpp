@@ -178,6 +178,7 @@ void PatternDatabase::generatePDB(PieceType pieceType, std::vector<uint8_t>& pdb
 void PatternDatabase::saveToFile(const std::string& filename, const std::vector<uint8_t>& data) {
     std::ofstream file;
     fs::path filePath = PDBFileHandler::getFilePath(filename);
+
     file.open(filePath, std::ios::out | std::ios::binary | std::ios::trunc);
     if(file.is_open()){
         file.write(reinterpret_cast<const char*>(data.data()), data.size());
