@@ -22,8 +22,7 @@ struct Result {
 class IDAStar {
 private:
     size_t calculateHeuristic(const Cube& c) const;
-    static void getSuccessors(const Cube& c, std::vector<Cube>& successors);
-    Result search(std::vector<Cube>& searchPath, std::vector<Move>& movePath, size_t g, size_t bound) const;
+    Result search(Cube& cube, std::vector<Move>& movePath, size_t g, size_t bound, Move last = MOVE_N) const;
 
 public:
     static void condenseMoves(std::vector<Move>& movePath);

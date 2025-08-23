@@ -24,7 +24,6 @@ enum Move : unsigned char {
 
 inline auto face = [](Move m) { return static_cast<int>(m) / 3; };
 inline bool isOpposingFace(Move a, Move b) { return face(a) != face(b) && face(a) / 2 == face(b) / 2; }
-//bool sameFace = [](Move a, Move b){ return face(a) == face(b); };
 
 // clockwise turns
 inline int getNumTurns(Move m) {
@@ -43,8 +42,19 @@ inline Move getMove(int f, int turns) {
     return static_cast<Move>(f * 3 + d);
 }
 
+inline Move inverse(Move m) {
+    if (getNumTurns(m) == 2) return m;
+    const auto t = (getNumTurns(m) + 2) % 4;
+    return getMove(face(m), t);
+}
+
 static constexpr std::array<Move, MOVE_N> MOVES = {
-        U,U2,U_PRIME, D,D2,D_PRIME, L,L2,L_PRIME, R,R2,R_PRIME, F,F2,F_PRIME, B,B2,B_PRIME
+    U,U2,U_PRIME,
+    D,D2,D_PRIME,
+    L,L2,L_PRIME,
+    R,R2,R_PRIME,
+    F,F2,F_PRIME,
+    B,B2,B_PRIME,
 };
 
 

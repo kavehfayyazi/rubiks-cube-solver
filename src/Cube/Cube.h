@@ -17,8 +17,8 @@
 
 class Cube {
 private:
-    const uint64_t cornerState;
-    const uint64_t edgeState;
+    uint64_t cornerState;
+    uint64_t edgeState;
     
     void switch_pieces(PieceType pieceType, PiecePart piecePart, uint64_t& state, std::array<unsigned char, 4> idxList, unsigned char rot) const;
     void orient_corners(uint64_t& state, Move move) const;
@@ -30,17 +30,18 @@ public:
     Cube(); // Default constructor initalizes solved state
     Cube(uint64_t cornerState, uint64_t edgeState);
 
-    std::string genScramble(int n) const;
+    std::vector<Move> genScramble(int n) const;
     
     uint64_t getCornerState() const;
     uint64_t getEdgeState() const;
     
     unsigned char getState(PieceType pieceType, PiecePart piecePart, const uint64_t& state, unsigned char idx) const;
     void setState(PieceType pieceType, PiecePart piecePart, uint64_t& state, unsigned char idx, unsigned char value) const;
-    
-    Cube move(std::string moves) const;
-    Cube move(Move move) const;
-    
+
+    void doMove(Move move);
+    void undoMove(Move move);
+    void doMoves(std::vector<Move> moves);
+
     void printCornerState(const uint64_t& cornerState) const;
     void printEdgeState(const uint64_t& edgeState) const;
     void printState() const;

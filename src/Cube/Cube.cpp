@@ -141,27 +141,26 @@ edgeState([&] {
 Cube::Cube(uint64_t cornerState, uint64_t edgeState) : cornerState(cornerState), edgeState(edgeState) {}
 
 
-std::string Cube::genScramble(int n) const {
-    if (n == 0) return "";
-    std::string scramble;
+std::vector<Move> Cube::genScramble(int n) const {
+    if (n == 0) return std::vector<Move>{};
+    std::vector<Move> scramble;
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dist(0, MOVE_N - 1);
 
-    int prevMoveType = -1;
+    Move prevMove = MOVE_N;
     for (int i = 0; i < n; i++) {
-        int moveType;
+        Move currMove;
         int move;
         while (true) {
             move = dist(gen);
-            moveType = int(move / 3);
-            if (moveType != prevMoveType) break;
+            currMove = STRING_TO_MOVE.at(CODE_TO_MOVE_STRING.at(move));
+            if (face(currMove) != face(prevMove)) break;
         }
-        auto it = CODE_TO_MOVE_STRING.find(move);
-        scramble += " " + CODE_TO_MOVE_STRING.at(move);
-        prevMoveType = moveType;
+        scramble.push_back(currMove);
+        prevMove = currMove;
     }
-    return scramble.substr(1, scramble.length()); // remove leading white space
+    return scramble;
 }
 
 uint64_t Cube::getCornerState() const { return cornerState; }
@@ -217,8 +216,16 @@ void Cube::setState(PieceType pieceType, PiecePart piecePart, uint64_t& state, u
     state |= ((uint64_t(value & ((1 << num_bits) - 1))) << bit_pos);
 }
 
-Cube Cube::move(std::string moves) const {
-    return parseMoves(moves, cornerState, edgeState);
+void Cube::doMove(Move move) {
+    singleMove(move, cornerState, edgeState);
+}
+
+void Cube::undoMove(Move move) {
+    singleMove(inverse(move), cornerState, edgeState);
+}
+
+void Cube::doMoves(std::vector<Move> moves) {
+    for (Move m : moves) singleMove(m, cornerState, edgeState);
 }
 
 // Corner i (pos, ori) = x, y
