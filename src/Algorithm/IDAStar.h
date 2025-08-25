@@ -22,6 +22,7 @@ struct Result {
 class IDAStar {
 private:
     size_t calculateHeuristic(const Cube& c) const;
+    inline bool multiLevelHeuristic(const Cube& c, size_t& f, const size_t& g, const size_t bound) const;
     Result search(Cube& cube, std::vector<Move>& movePath, size_t g, size_t bound, Move last = MOVE_N) const;
 
 public:

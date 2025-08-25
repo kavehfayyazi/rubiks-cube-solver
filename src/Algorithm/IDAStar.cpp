@@ -4,6 +4,7 @@
 
 #include "IDAStar.h"
 #include <cstdint>
+#include <algorithm>
 
 size_t IDAStar::calculateHeuristic(const Cube& c) const {
     unsigned char cH = corner.search(pdb.encodeState(PieceType::Corner, c));
@@ -12,12 +13,24 @@ size_t IDAStar::calculateHeuristic(const Cube& c) const {
     return cH + e1H + e2H;
 }
 
+// returns false if f (g + h) > bound. calculates f in place
+inline bool IDAStar::multiLevelHeuristic(const Cube& c, size_t& f, const size_t& g, const size_t bound) const {
+    size_t h = corner.search(pdb.encodeState(PieceType::Corner, c));
+    f = g + h; if (f > bound) return false;
+
+    h += edge_start.search(pdb.encodeState(PieceType::Edge, c, true));
+    f = g + h; if (f > bound) return false;
+
+    h += edge_end.search(pdb.encodeState(PieceType::Edge, c, false));
+    f = g + h; if (f > bound) return false;
+    return true;
+}
+
 Result IDAStar::search(Cube& cube, std::vector<Move>& movePath, size_t g, size_t bound, Move last) const {
     if (cube.is_solved()) return Result{true, 0};
 
-    size_t h = calculateHeuristic(cube);
-    size_t f = g + h;
-    if (f > bound) return Result{false, f};
+    size_t f = 0;
+    if (!multiLevelHeuristic(cube, f, g, bound)) return Result{false, f};
 
     size_t minNextThreshold = SIZE_MAX;
 
@@ -48,44 +61,51 @@ IDAStar::IDAStar() :
 {}
 
 static inline void pushAndReduce(std::vector<Move>& v, Move m) {
+    // write function so
+
+    // while loop so it brings it all the way left,
+    // if same face merge and keep going,
+    // if opposite face swap
+    // other: break
+
     v.push_back(m);
     if (v.size() == 1) return;
 
-    size_t idx = v.size() - 1; // index of m
+    size_t idx = v.size() - 1; // location of pushed element
+    while (idx > 0) { // loop runs while element to left exists
+        size_t leftIdx = idx - 1;
+        Move L = v[leftIdx];
+        Move R = v[idx];
 
-    // Bubble across opposing faces
-    while (idx > 0 && isOpposingFace(v[idx], v[idx - 1])) {
-        std::swap(v[idx], v[idx - 1]);
-        --idx;
-    }
+        if (isSameFace(L, R)){ // merge element to left with right
+            int t = (getNumTurns(L) + getNumTurns(R)) % 4;
+            v.erase(v.begin() + idx); // remove right element
 
-    // Merge with same-face neighbor
-    while (idx > 0 && face(v[idx]) == face(v[idx - 1])) {
-        const auto f = face(m);
-        const auto t = getNumTurns(v[idx]) + getNumTurns(v[idx - 1]) & 3;
-
-        v.erase(v.begin() + idx);   // drop right one
-        --idx;                              // now left one is at idx
-
-        if (t == 0) { // canceled out so remove left
-            v.erase(v.begin() + idx);
-            return;
-        } else { // write merged move in place
-            v[idx] = getMove(f, t);
-
-            // after merging, the merged move may commute further left
-            while (idx > 0 && isOpposingFace(v[idx], v[idx - 1])) {
-                std::swap(v[idx], v[idx - 1]);
-                --idx;
+            if (t == 0) {
+                v.erase(v.begin() + leftIdx); // remove left element
+                return;
+            }
+            else {
+                v[leftIdx] = getMove(face(L), t); // replace element
+                idx = leftIdx;
+                continue;
             }
         }
+        else if (isOpposingFace(L, R)) {
+            std::swap(v[leftIdx], v[idx]);
+            idx = leftIdx;
+            continue;
+        }
+
+        break;
     }
 }
 
 void IDAStar::condenseMoves(std::vector<Move>& movePath) {
     if (movePath.empty()) return;
 
-    std::vector<Move> moves;    moves.reserve(movePath.size());
+    std::vector<Move> moves;
+    moves.reserve(movePath.size());
 
     for (Move m : movePath) pushAndReduce(moves, m);
     moves.swap(movePath);

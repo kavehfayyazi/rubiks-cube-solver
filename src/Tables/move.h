@@ -22,11 +22,29 @@ enum Move : unsigned char {
     MOVE_N=18 // Sentinel value
 };
 
+inline constexpr unsigned char FACES[18] = {
+        0,0,0,
+        1,1,1,
+        2,2,2,
+        3,3,3,
+        4,4,4,
+        5,5,5
+};
+inline constexpr unsigned char OPPOSING_FACES[18] = {
+        1,1,1,
+        0,0,0,
+        3,3,3,
+        2,2,2,
+        5,5,5,
+        4,4,4,
+};
+
 inline auto face = [](Move m) { return static_cast<int>(m) / 3; };
-inline bool isOpposingFace(Move a, Move b) { return face(a) != face(b) && face(a) / 2 == face(b) / 2; }
+inline constexpr bool isSameFace(Move a, Move b) { return face(a) == face(b); }
+inline constexpr bool isOpposingFace(Move a, Move b) { return face(a) != face(b) && face(a) / 2 == face(b) / 2; }
 
 // clockwise turns
-inline int getNumTurns(Move m) {
+inline constexpr int getNumTurns(Move m) {
     switch (m) {
         case U:case D:case L:case R:case F:case Move::B:                                return 1;
         case U2:case D2:case L2:case R2:case F2:case B2:                                return 2;
@@ -35,20 +53,25 @@ inline int getNumTurns(Move m) {
     }
 }
 
-inline Move getMove(int f, int turns) {
+inline constexpr Move getMove(int f, int turns) {
     int t = ((turns % 4) + 4) % 4; // 0..3
     if (t == 0) return MOVE_N;
     int d = (t == 1) ? 0 : (t == 2) ? 1 : 2; // 1=clockwise, 2=2, 3=prime, comply with enum
     return static_cast<Move>(f * 3 + d);
 }
 
-inline Move inverse(Move m) {
+inline constexpr Move inverse(Move m) {
     if (getNumTurns(m) == 2) return m;
     const auto t = (getNumTurns(m) + 2) % 4;
     return getMove(face(m), t);
 }
 
-static constexpr std::array<Move, MOVE_N> MOVES = {
+// helper: get quarter-turn move for a face (U,D,L,R,F,B)
+inline constexpr Move baseOf(Move m) {
+    return static_cast<Move>(face(m) * 3);
+}
+
+inline constexpr std::array<Move, MOVE_N> MOVES = {
     U,U2,U_PRIME,
     D,D2,D_PRIME,
     L,L2,L_PRIME,
