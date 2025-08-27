@@ -8,8 +8,7 @@
 #ifndef RUBIKS_CUBE_SOLVER_CUBE_H
 #define RUBIKS_CUBE_SOLVER_CUBE_H
 
-#include "moveTables.h"
-#include "pieceClassification.h"
+#include "types.h"
 #include <array>
 #include <string>
 #include <cstdint>
@@ -17,66 +16,33 @@
 
 class Cube {
 private:
-    uint64_t cornerState;
-    uint64_t edgeState;
-    
-    void switch_pieces(PieceType pieceType, PiecePart piecePart, uint64_t& state, std::array<unsigned char, 4> idxList, unsigned char rot) const;
-    void orient_corners(uint64_t& state, Move move) const;
-    void orient_edges(uint64_t& state, Move move) const;
-    
-    Cube parseMoves(std::string moves, const uint64_t& cornerState, const uint64_t& edgeState) const;
-    void singleMove(Move move, uint64_t& cornerState, uint64_t& edgeState) const;
+    uint8_t cp[CORNERS_N];  // corner permutation: which corner is at position i
+    uint8_t co[CORNERS_N];  // corner orientation: 0,1,2
+    uint8_t ep[EDGES_N]; // edge permutation
+    uint8_t eo[EDGES_N]; // edge orientation: 0/1
+
+    uint8_t edgesFirstHalf[HALF_EDGES_N] = {0,1,2,3,8,9};
+    uint8_t edgesSecondHalf[HALF_EDGES_N] = {4,5,6,7,10,11};
+
 public:
+    // ---- Constructors ----
     Cube(); // Default constructor initalizes solved state
-    Cube(uint64_t cornerState, uint64_t edgeState);
+    Cube(const uint8_t cp_[CORNERS_N], const uint8_t co_[CORNERS_N], const uint8_t ep_[EDGES_N], const uint8_t eo_[EDGES_N]);
 
+    // ---- Core operations ----
+    void doMove (Move move);
+    void undoMove (Move move);
+    void doMoves(const std::vector<Move>& moves);
     std::vector<Move> genScramble(int n) const;
-    
-    uint64_t getCornerState() const;
-    uint64_t getEdgeState() const;
-    
-    unsigned char getState(PieceType pieceType, PiecePart piecePart, const uint64_t& state, unsigned char idx) const;
-    void setState(PieceType pieceType, PiecePart piecePart, uint64_t& state, unsigned char idx, unsigned char value) const;
-
-    void doMove(Move move);
-    void undoMove(Move move);
-    void doMoves(std::vector<Move> moves);
-
-    void printCornerState(const uint64_t& cornerState) const;
-    void printEdgeState(const uint64_t& edgeState) const;
-    void printState() const;
-    
     bool is_solved() const;
 
+    // ---- Encoding ----
+    uint64_t encodeCorners() const;
+    uint64_t encodeFirstEdges() const;
+    uint64_t encodeSecondEdges() const;
+
+    // ---- Operators ----
     bool operator==(const Cube& other) const;
-private:
-    static constexpr unsigned char NUM_CORNERS = 8;
-    static constexpr unsigned char CORNER_POS_BITS = 3;
-    static constexpr unsigned char CORNER_ORI_BITS = 2;
-    static constexpr unsigned char TOTAL_CORNER_ORI_BITS = NUM_CORNERS * CORNER_ORI_BITS;
-
-    static constexpr unsigned char NUM_EDGES = 12;
-    static constexpr unsigned char EDGE_POS_BITS = 4;
-    static constexpr unsigned char EDGE_ORI_BITS = 1;
-    static constexpr unsigned char TOTAL_EDGE_ORI_BITS = NUM_EDGES * EDGE_ORI_BITS;
-
-    inline static constexpr uint64_t solvedCornerState = [] {
-        uint64_t s = 0;
-        for (unsigned i = 0; i < NUM_CORNERS; ++i) {
-            unsigned shift = TOTAL_CORNER_ORI_BITS + CORNER_POS_BITS * i;
-            s |= (uint64_t{i} << shift);
-        }
-        return s;
-    }();
-
-    inline static constexpr uint64_t solvedEdgeState = [] {
-        uint64_t s = 0;
-        for (unsigned i = 0; i < NUM_EDGES; ++i) {
-            unsigned shift = TOTAL_EDGE_ORI_BITS + EDGE_POS_BITS * i;
-            s |= (uint64_t{i} << shift);
-        }
-        return s;
-    }();
 };
 
 #endif

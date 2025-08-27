@@ -1,0 +1,2 @@
+add_subdirectory(CubeLegacy)
+add_subdirectory(PatternDatabaseLegacy)

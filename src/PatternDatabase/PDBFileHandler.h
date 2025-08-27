@@ -10,6 +10,7 @@
 #include <vector>
 #include <fstream>
 #include <cstdint>
+#include <iostream>
 #include <algorithm>
 #include <filesystem>
 
@@ -17,41 +18,24 @@ namespace fs = std::filesystem;
 
 class PDBFileHandler {
 public:
-    static fs::path getFilePath(const std::string& filename) {
-        std::string cwd(PDB_DIR);
-        fs::path filePath = cwd + "/" + filename;
-        return filePath;
-    }
+    fs::path getFilePath(const std::string fn);
 
-    PDBFileHandler(const std::string& filename) {
-        fs::path filePath = getFilePath(filename);
-        file.open(filePath, std::ios::in | std::ios::binary);
-        if(!file.is_open()) throw std::runtime_error("Cannot open file: " + filePath.string());
+    PDBFileHandler(const std::string& fileName);
 
-        file.seekg(0, std::ios::end);
-        long fileSize = file.tellg();
-        file.seekg(0, std::ios::beg);
+    void load();
+    void save(const std::vector<uint8_t>& data);
+    uint8_t getPDBVal(uint64_t idx) const;
+    uint64_t getBytes() const;
 
-        std::vector<char> buffer(fileSize);
-        file.read(buffer.data(), fileSize);
-        if(!file) throw std::runtime_error("Cannot read file: " + filename);
-
-        pdb.clear();
-        pdb.reserve(buffer.size());
-        std::transform(
-                buffer.begin(), buffer.end(),
-                std::back_inserter(pdb),
-                [](char c){ return static_cast<uint8_t>(c); }
-        );
-    }
-
-    uint8_t search(size_t idx) const {
-        if (idx & 1) return (pdb[idx / 2] >> 4) & 0xF;
-        else return pdb[idx / 2] & 0xF;
-    }
+    // static array helpers
+    static bool isHighNibble(uint64_t idx);
+    static bool notReached(std::vector<uint8_t>& data, uint64_t idx); // all nibbles are defaulted to 0x0F
+    static uint8_t getVal(std::vector<uint8_t>& data, uint64_t idx);
+    static void setVal(std::vector<uint8_t>& data, uint64_t idx, uint8_t val);
 
 private:
-    std::ifstream file;
+    std::string fileName;
+    fs::path filePath;
     std::vector<uint8_t> pdb;
 };
 

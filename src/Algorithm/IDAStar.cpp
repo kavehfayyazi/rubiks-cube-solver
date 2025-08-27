@@ -5,28 +5,30 @@
 #include "IDAStar.h"
 #include <cstdint>
 #include <algorithm>
+#include "cassert" // TESTING
+#include "utils.h"
 
-size_t IDAStar::calculateHeuristic(const Cube& c) const {
-    unsigned char cH = corner.search(pdb.encodeState(PieceType::Corner, c));
-    unsigned char e1H = edge_start.search(pdb.encodeState(PieceType::Edge, c, true));
-    unsigned char e2H = edge_end.search(pdb.encodeState(PieceType::Edge, c, false));
+inline uint8_t IDAStar::calculateHeuristic(const Cube& c) const {
+    unsigned char cH  = corner.getPDBVal(c.encodeCorners());
+    unsigned char e1H = edgeStart.getPDBVal(c.encodeFirstEdges());
+    unsigned char e2H = edgeEnd.getPDBVal(c.encodeSecondEdges());
     return cH + e1H + e2H;
 }
 
 // returns false if f (g + h) > bound. calculates f in place
 inline bool IDAStar::multiLevelHeuristic(const Cube& c, size_t& f, const size_t& g, const size_t bound) const {
-    size_t h = corner.search(pdb.encodeState(PieceType::Corner, c));
+    size_t h = corner.getPDBVal(c.encodeCorners());
     f = g + h; if (f > bound) return false;
 
-    h += edge_start.search(pdb.encodeState(PieceType::Edge, c, true));
+    h += edgeEnd.getPDBVal(c.encodeSecondEdges());
     f = g + h; if (f > bound) return false;
 
-    h += edge_end.search(pdb.encodeState(PieceType::Edge, c, false));
+    h += edgeStart.getPDBVal(c.encodeFirstEdges());
     f = g + h; if (f > bound) return false;
     return true;
 }
 
-Result IDAStar::search(Cube& cube, std::vector<Move>& movePath, size_t g, size_t bound, Move last) const {
+Result IDAStar::search(Cube& cube, std::vector<Move>& movePath, size_t g, size_t bound, Move last, Move last2) const {
     if (cube.is_solved()) return Result{true, 0};
 
     size_t f = 0;
@@ -35,13 +37,15 @@ Result IDAStar::search(Cube& cube, std::vector<Move>& movePath, size_t g, size_t
     size_t minNextThreshold = SIZE_MAX;
 
     for (Move m : MOVES) {
-        if (last != MOVE_N)
-            if (face(m) == face(last)) continue; // skip same face moves (includes inverse)
+        if (last != MOVE_N && face(m) == face(last)) continue; // skip same face moves (includes inverse)
+
+        // Skip A B A where B is opposite face of A (e.g., R L R)
+        if (last2 != MOVE_N && face(m) == face(last2) && isOpposingFace(m, last)) continue;
 
         cube.doMove(m);
         movePath.push_back(m);
 
-        Result t = search(cube, movePath, g + 1, bound, m);
+        Result t = search(cube, movePath, g + 1, bound, m, last);
         if (t.found) return Result{true, 0};
         minNextThreshold = std::min(minNextThreshold, t.nextThreshold);
 
@@ -52,22 +56,16 @@ Result IDAStar::search(Cube& cube, std::vector<Move>& movePath, size_t g, size_t
 }
 
 IDAStar::IDAStar() :
-    pdb(PatternDatabase(
-            {0,1,2,3,8,9},
-            {4,5,6,7,10,11})),
     corner(PDBFileHandler("corner.pdb")),
-    edge_start(PDBFileHandler("edge_start.pdb")),
-    edge_end(PDBFileHandler("edge_end.pdb"))
-{}
+    edgeStart(PDBFileHandler("edgeFirst.pdb")),
+    edgeEnd(PDBFileHandler("edgeSecond.pdb"))
+{
+    corner.load();
+    edgeStart.load();
+    edgeEnd.load();
+}
 
 static inline void pushAndReduce(std::vector<Move>& v, Move m) {
-    // write function so
-
-    // while loop so it brings it all the way left,
-    // if same face merge and keep going,
-    // if opposite face swap
-    // other: break
-
     v.push_back(m);
     if (v.size() == 1) return;
 
@@ -114,8 +112,7 @@ void IDAStar::condenseMoves(std::vector<Move>& movePath) {
 bool IDAStar::solve(Cube root, std::vector<Move>& movePath) const {
     size_t bound = calculateHeuristic(root);
     while (true) {
-        movePath.clear();            // reset for this IDA* iteration
-
+        movePath.clear(); // reset for this IDA* iteration
         Result t = search(root, movePath, 0, bound);
         if (t.found) {
             condenseMoves(movePath);

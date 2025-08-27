@@ -15,93 +15,153 @@ TEST_CASE("Cube default state is solved") {
     REQUIRE(cube.is_solved());
 }
 
-TEST_CASE("Cube after one turn is not solved") {
-    Cube cube;
-    REQUIRE_FALSE(cube.move("U").is_solved());
-    REQUIRE_FALSE(cube.move("U").is_solved());
-    REQUIRE_FALSE(cube.move("U2").is_solved());
-    REQUIRE_FALSE(cube.move("D").is_solved());
-    REQUIRE_FALSE(cube.move("D").is_solved());
-    REQUIRE_FALSE(cube.move("D2").is_solved());
-    REQUIRE_FALSE(cube.move("L").is_solved());
-    REQUIRE_FALSE(cube.move("L").is_solved());
-    REQUIRE_FALSE(cube.move("L2").is_solved());
-    REQUIRE_FALSE(cube.move("R").is_solved());
-    REQUIRE_FALSE(cube.move("R").is_solved());
-    REQUIRE_FALSE(cube.move("R2").is_solved());
-    REQUIRE_FALSE(cube.move("F").is_solved());
-    REQUIRE_FALSE(cube.move("F").is_solved());
-    REQUIRE_FALSE(cube.move("F2").is_solved());
-    REQUIRE_FALSE(cube.move("B").is_solved());
-    REQUIRE_FALSE(cube.move("B").is_solved());
-    REQUIRE_FALSE(cube.move("B2").is_solved());
+TEST_CASE("Move inverses are correct") {
+    REQUIRE(U == INVERSE[U_PRIME]);
+    REQUIRE(U2 == INVERSE[U2]);
+    REQUIRE(U_PRIME == INVERSE[U]);
+    REQUIRE(D == INVERSE[D_PRIME]);
+    REQUIRE(D2 == INVERSE[D2]);
+    REQUIRE(D_PRIME == INVERSE[D]);
+    REQUIRE(L == INVERSE[L_PRIME]);
+    REQUIRE(L2 == INVERSE[L2]);
+    REQUIRE(L_PRIME == INVERSE[L]);
+    REQUIRE(R == INVERSE[R_PRIME]);
+    REQUIRE(R2 == INVERSE[R2]);
+    REQUIRE(R_PRIME == INVERSE[R]);
+    REQUIRE(F == INVERSE[F_PRIME]);
+    REQUIRE(F2 == INVERSE[F2]);
+    REQUIRE(F_PRIME == INVERSE[F]);
+    REQUIRE(B == INVERSE[B_PRIME]);
+    REQUIRE(B2 == INVERSE[B2]);
+    REQUIRE(B_PRIME == INVERSE[B]);
 }
 
-
-TEST_CASE("Cube after one turn and its inverse is solved") {
+TEST_CASE("Cube after one turn is not solved and its inverse is solved") {
     Cube cube;
-    REQUIRE(cube.move("U' U").is_solved());
-    REQUIRE(cube.move("U' U").is_solved());
-    REQUIRE(cube.move("D' D").is_solved());
-    REQUIRE(cube.move("D' D").is_solved());
-    REQUIRE(cube.move("L' L").is_solved());
-    REQUIRE(cube.move("L' L").is_solved());
-    REQUIRE(cube.move("R' R").is_solved());
-    REQUIRE(cube.move("R' R").is_solved());
-    REQUIRE(cube.move("F' F").is_solved());
-    REQUIRE(cube.move("F' F").is_solved());
-    REQUIRE(cube.move("B' B").is_solved());
-    REQUIRE(cube.move("B' B").is_solved());
+    for (Move m : MOVES) {
+        cube.doMove(m);
+        REQUIRE_FALSE(cube.is_solved());
+        cube.undoMove(m);
+        REQUIRE(cube.is_solved());
+    }
 }
 
 TEST_CASE("Cube after two double turns is solved") {
     Cube cube;
-    REQUIRE(cube.move("U2 U2").is_solved());
-    REQUIRE(cube.move("D2 D2").is_solved());
-    REQUIRE(cube.move("L2 L2").is_solved());
-    REQUIRE(cube.move("R2 R2").is_solved());
-    REQUIRE(cube.move("F2 F2").is_solved());
-    REQUIRE(cube.move("B2 B2").is_solved());
+    cube.doMove(U2);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(U2);
+    REQUIRE(cube.is_solved());
+    cube.doMove(D2);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(D2);
+    REQUIRE(cube.is_solved());
+    cube.doMove(L2);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(L2);
+    REQUIRE(cube.is_solved());
+    cube.doMove(R2);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(R2);
+    REQUIRE(cube.is_solved());
+    cube.doMove(F2);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(F2);
+    REQUIRE(cube.is_solved());
+    cube.doMove(B2);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(B2);
+    REQUIRE(cube.is_solved());
 }
 
 TEST_CASE("Cube with each turn for a single face is solved") {
     Cube cube;
-    REQUIRE(cube.move("U U U2").is_solved());
-    REQUIRE(cube.move("U U U2").is_solved());
-    REQUIRE(cube.move("D D D2").is_solved());
-    REQUIRE(cube.move("D D D2").is_solved());
-    REQUIRE(cube.move("L L L2").is_solved());
-    REQUIRE(cube.move("L L L2").is_solved());
-    REQUIRE(cube.move("R R R2").is_solved());
-    REQUIRE(cube.move("R R R2").is_solved());
-    REQUIRE(cube.move("F F F2").is_solved());
-    REQUIRE(cube.move("F F F2").is_solved());
-    REQUIRE(cube.move("B B B2").is_solved());
-    REQUIRE(cube.move("B B B2").is_solved());
-
-    REQUIRE(cube.move("U' U' U2").is_solved());
-    REQUIRE(cube.move("U' U' U2").is_solved());
-    REQUIRE(cube.move("D' D' D2").is_solved());
-    REQUIRE(cube.move("D' D' D2").is_solved());
-    REQUIRE(cube.move("L' L' L2").is_solved());
-    REQUIRE(cube.move("L' L' L2").is_solved());
-    REQUIRE(cube.move("R' R' R2").is_solved());
-    REQUIRE(cube.move("R' R' R2").is_solved());
-    REQUIRE(cube.move("F' F' F2").is_solved());
-    REQUIRE(cube.move("F' F' F2").is_solved());
-    REQUIRE(cube.move("B' B' B2").is_solved());
-    REQUIRE(cube.move("B' B' B2").is_solved());
-
-    REQUIRE(cube.move("U U' U' U U2 U2").is_solved());
-    REQUIRE(cube.move("U U' U' U U2 U2").is_solved());
-    REQUIRE(cube.move("D D' D' D D2 D2").is_solved());
-    REQUIRE(cube.move("D D' D' D D2 D2").is_solved());
-    REQUIRE(cube.move("L L' L' L L2 L2").is_solved());
-    REQUIRE(cube.move("L L' L' L L2 L2").is_solved());
-    REQUIRE(cube.move("R R' R' R R2 R2").is_solved());
-    REQUIRE(cube.move("R R' R' R R2 R2").is_solved());
-    REQUIRE(cube.move("F F' F' F F2 F2").is_solved());
-    REQUIRE(cube.move("F F' F' F F2 F2").is_solved());
-    REQUIRE(cube.move("B B' B' B B2 B2").is_solved());
-    REQUIRE(cube.move("B B' B' B B2 B2").is_solved());
+    // E.g. U U U2
+    cube.doMove(U);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(U);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(U2);
+    REQUIRE(cube.is_solved());
+    cube.doMove(D);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(D);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(D2);
+    REQUIRE(cube.is_solved());
+    cube.doMove(L);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(L);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(L2);
+    REQUIRE(cube.is_solved());
+    cube.doMove(R);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(R);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(R2);
+    REQUIRE(cube.is_solved());
+    cube.doMove(F);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(F);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(F2);
+    REQUIRE(cube.is_solved());
+    cube.doMove(B);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(B);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(B2);
+    REQUIRE(cube.is_solved());
+    // E.g. U' U' U2
+    cube.doMove(U_PRIME);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(U_PRIME);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(U2);
+    REQUIRE(cube.is_solved());
+    cube.doMove(D_PRIME);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(D_PRIME);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(D2);
+    REQUIRE(cube.is_solved());
+    cube.doMove(L_PRIME);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(L_PRIME);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(L2);
+    REQUIRE(cube.is_solved());
+    cube.doMove(R_PRIME);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(R_PRIME);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(R2);
+    REQUIRE(cube.is_solved());
+    cube.doMove(F_PRIME);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(F_PRIME);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(F2);
+    REQUIRE(cube.is_solved());
+    cube.doMove(B_PRIME);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(B_PRIME);
+    REQUIRE_FALSE(cube.is_solved());
+    cube.doMove(B2);
+    REQUIRE(cube.is_solved());
 }
+
+TEST_CASE("Cube with random scrabbles and inverses is solved") {
+    for (int i = 1; i < 100; ++i) {
+        Cube cube;
+        auto scramble = cube.genScramble(i);
+        for (Move m : scramble) cube.doMove(m);
+        REQUIRE_FALSE(cube.is_solved());
+        for (auto it = scramble.rbegin(); it != scramble.rend(); ++it) cube.doMove(INVERSE[*it]);
+        REQUIRE(cube.is_solved());
+    }
+}
+
+
+

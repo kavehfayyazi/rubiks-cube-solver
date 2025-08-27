@@ -21,20 +21,19 @@ struct Result {
 
 class IDAStar {
 private:
-    size_t calculateHeuristic(const Cube& c) const;
+    uint8_t calculateHeuristic(const Cube& c) const;
     inline bool multiLevelHeuristic(const Cube& c, size_t& f, const size_t& g, const size_t bound) const;
-    Result search(Cube& cube, std::vector<Move>& movePath, size_t g, size_t bound, Move last = MOVE_N) const;
+    Result search(Cube& cube, std::vector<Move>& movePath, size_t g, size_t bound, Move last=MOVE_N, Move last2=MOVE_N) const;
+    static void condenseMoves(std::vector<Move>& movePath);
 
 public:
-    static void condenseMoves(std::vector<Move>& movePath);
     IDAStar();
     bool solve(Cube root, std::vector<Move>& moveSolution) const;
 
 private:
-    PatternDatabase pdb;
     PDBFileHandler corner;
-    PDBFileHandler edge_start;
-    PDBFileHandler edge_end;
+    PDBFileHandler edgeStart;
+    PDBFileHandler edgeEnd;
 };
 
 #endif
