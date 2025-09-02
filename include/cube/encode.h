@@ -23,6 +23,6 @@ extern const uint64_t epNum(const uint8_t ep[12], const uint8_t edgeGroup[6]);
 extern const uint64_t epRank(const uint8_t ep[12], const uint8_t edgeGroup[6]);
 
 // base 2 encoding
-extern const uint64_t eoNumHalf(const uint8_t eo[12], const uint8_t group[6]);
+extern const uint64_t eoNumHalf(const uint8_t ep[12], const uint8_t eo[12], const uint8_t group[6]);
 
 #endif //RUBIKSCUBESOLVER_ENCODE_H

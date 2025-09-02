@@ -1,56 +1,46 @@
-
 #include <iostream>
 #include <sstream>
 #include <filesystem>
 #include <thread>
 #include <chrono>
-#include "solve.h"
+#include <string>
 #include "move.h"
 #include "cube.h"
 #include "maxdepths_api.h"
 #include "pdbgen_api.h"
+#include "ida_star.h"
 
 namespace fs = std::filesystem;
 using MoveList = std::vector<Move>;
 
-struct PdbPaths {
-    fs::path dir  = fs::path(PDB_DIR);
-    fs::path c    = fs::path(PDB_DIR) / PDB_CORNER_FILENAME;
-    fs::path e1   = fs::path(PDB_DIR) / PDB_EDGE_FIRST_FILENAME;
-    fs::path e2   = fs::path(PDB_DIR) / PDB_EDGE_SECOND_FILENAME;
-};
+static bool ensurePdbsPresent() {
+    std::vector<fs::path> missing;
+    const auto dirPath = fs::path(PDB_DIR);
+    const auto cornerPath = fs::path(PDB_DIR) / PDB_CORNER_FILENAME;
+    const auto edgeFirstPath = fs::path(PDB_DIR) / PDB_EDGE_FIRST_FILENAME;
+    const auto edgeSecondPath = fs::path(PDB_DIR) / PDB_EDGE_SECOND_FILENAME;
 
-static std::vector<fs::path> missingPdbs(const PdbPaths& p) {
-    std::vector<fs::path> miss;
-    if (!fs::exists(p.dir))            miss.push_back(p.dir.string() + " (directory)");
-    if (!fs::exists(p.c))              miss.push_back(p.c);
-    if (!fs::exists(p.e1))             miss.push_back(p.e1);
-    if (!fs::exists(p.e2))             miss.push_back(p.e2);
-    return miss;
-}
+    if (!fs::exists(dirPath))           missing.push_back(dirPath.string() + " (directory)");
+    if (!fs::exists(cornerPath))        missing.push_back(cornerPath.string());
+    if (!fs::exists(edgeFirstPath))     missing.push_back(edgeFirstPath.string());
+    if (!fs::exists(edgeSecondPath))    missing.push_back(edgeSecondPath.string());
 
-static bool ensurePdbsPresent(bool printWhy = true) {
-    PdbPaths p;
-    auto miss = missingPdbs(p);
-    if (!miss.empty()) {
-        if (printWhy) {
-            std::cout << "Missing PDB assets:\n";
-            for (auto& m : miss) std::cout << "  - " << m << '\n';
-            std::cout << "Run `generate` first." << std::endl;
-        }
+    if (!missing.empty()) {
+        std::cout << "Missing PDB assets:\n";
+        for (auto& m : missing) std::cout << "  - " << m << '\n';
+        std::cout << "Run `generate` first." << std::endl;
         return false;
     }
     return true;
 }
 
-std::string moveListToString(const std::string& start, const MoveList& moves) {
-    std::ostringstream out;
-    out << start;
+void printMoveList(const std::string& start, const MoveList& moves) {
+    std::cout << start;
     for (size_t i = 0; i < moves.size(); ++i) {
-        out << MOVE_TO_STRING.at(moves[i]);
-        if (i + 1 < moves.size()) out << ' ';
+        if (i) std::cout << ' '; // add one space between tokens
+        std::cout << MOVE_TO_STRING.at(moves[i]);
     }
-    return out.str();
+    std::cout << '\n';
 }
 
 static void printHelp() {
@@ -91,7 +81,6 @@ int main() {
         if (words.empty()) { std::cout << "rcs> " << std::flush; continue; }
 
         std::string w = popAndGetFront(words);
-
         if (w == "help") {
             printHelp();
         } else if (w == "generate") {
@@ -99,15 +88,15 @@ int main() {
             run_pdbgen();
             std::cout << "Generation complete.\n";
         } else if (w == "scramble") {
-            if (!ensurePdbsPresent()) {
-                // ensurePdbsPresent prints why; just fall through to prompt
-            } else if (!words.empty()) {
+            if (!ensurePdbsPresent()) {} // just fall through to prompt
+            else if (!words.empty()) {
+                IDAStar ida{};
                 int n = std::stoi(popAndGetFront(words));
                 if (n < 0) { std::cout << "Invalid N\n"; goto prompt; }
                 MoveList scramble{}, solve{};
-                solveScramble(n, scramble, solve);
-                std::cout << moveListToString("Scramble: ", scramble) << '\n';
-                std::cout << moveListToString("Solve:    ", solve) << '\n';
+                ida.solveScramble(n, scramble, solve);
+                printMoveList("Scramble: ", scramble);
+                printMoveList("Solve:    ", solve);
                 Cube c{};
                 c.doMoves(scramble);
                 c.doMoves(solve);

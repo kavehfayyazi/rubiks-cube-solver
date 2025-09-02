@@ -5,7 +5,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-
 # Changeable Pattern Database Variables
 set(PDB_DIR               "${CMAKE_SOURCE_DIR}/pdb" CACHE PATH   "Default directory for PDB files at runtime")
 set(PDB_CORNER_FILE       "corner.pdb"              CACHE STRING "Corner PDB filename")
@@ -20,12 +19,11 @@ target_compile_definitions(pdb_config INTERFACE
         PDB_EDGE_SECOND_FILENAME="${PDB_EDGE_SECOND_FILE}"
 )
 
-add_subdirectory(app)
-add_subdirectory(app/solver)
 add_subdirectory(src/cube)
 add_subdirectory(src/ida_star)
 add_subdirectory(tools/pdbgen)
 add_subdirectory(tools/maxdepths)
+add_subdirectory(tools/cli)
 
 include(CTest)
 if(BUILD_TESTING)

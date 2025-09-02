@@ -6,45 +6,57 @@
 #include <queue>
 #include <unordered_set>
 #include <iostream>
+#include <thread>
 #include "cube.h"
 #include "move.h"
+#include "pdb_handler.h"
+#include "pdb_constants.h"
 
-uint8_t findMaxDepth(bool isCorner, bool isEdgeFirst) {
+// Can use PDB handler static helper functions
+void printMaxDepth(const std::string& start, bool isCorner, bool isEdgeFirst) {
     using Depth = uint8_t;
 
+    uint64_t len = (isCorner) ? CORNER_PDB_BYTES : EDGE_PDB_BYTES;
+    std::vector<uint8_t> visitedStates(len, 0xFF);
+
     uint64_t (Cube::*encodeFuncPtr)() const =
-        (isCorner) ? (&Cube::encodeCorners) :
-        (isEdgeFirst) ? (&Cube::encodeFirstEdges) :
-                        (&Cube::encodeSecondEdges);
+    (isCorner) ? (&Cube::encodeCorners) :
+    (isEdgeFirst) ? (&Cube::encodeFirstEdges) :
+    (&Cube::encodeSecondEdges);
 
-    std::queue<std::pair<Cube, Depth>> q;
-    std::unordered_set<uint64_t> visitedStates;
+    struct Node { Cube c; Depth d; Move last; };
+    std::queue<Node> q;
+    q.push({Cube(), 0, MOVE_N});
 
-    Cube start{};
-    visitedStates.insert((start.*encodeFuncPtr)());
-    q.emplace(start, 0);
+    // mark start
+    PdbHandler::setVal(visitedStates, (q.front().c.*encodeFuncPtr)(), 0);
 
-    Depth maxDepthFound = 0;
-
+    Depth maxDepth = 0;
     while (!q.empty()) {
-        auto [curr, depth] = q.front();
-        q.pop();
-
-        if (depth > maxDepthFound) maxDepthFound = depth;
+        Node curr = q.front(); q.pop();
 
         for (Move m : MOVES) {
-            Cube next = curr;
-            next.doMove(m);
+            if (curr.last != MOVE_N && isSameFace(curr.last, m)) continue;
+            curr.c.doMove(m);
+            uint64_t idx = (curr.c.*encodeFuncPtr)();
 
-            uint64_t code = (next.*encodeFuncPtr)();
-            if (visitedStates.insert(code).second) q.emplace(next, depth + 1);
+            if (PdbHandler::notReached(visitedStates, idx)) {
+                Depth nextDepth = curr.d + 1;
+                PdbHandler::setVal(visitedStates, idx, nextDepth);
+                q.push({curr.c, nextDepth, m});        // copy the moved state into the queue
+                maxDepth = std::max(nextDepth, maxDepth);
+            }
+            curr.c.undoMove(m);
         }
     }
-    return maxDepthFound;
+    std::cout << start << (int)maxDepth << '\n';
 }
 
 void printMaxDepths() {
-    std::cout << "Corner max depth: "       << (int)findMaxDepth()              << '\n';
-    std::cout << "Edge first max depth: "   << (int)findMaxDepth(false, true)   << '\n';
-    std::cout << "Edge second max depth: "  << (int)findMaxDepth(false, false)  << std::endl;
+    std::thread corner([&]() {      printMaxDepth("Corner max depth: "); });
+    std::thread edgeFirst([&]() {   printMaxDepth("Edge first max depth: ", false, true); });
+    std::thread edgeSecond([&]() {  printMaxDepth("Edge second max depth: ", false, false); });
+    corner.join();
+    edgeFirst.join();
+    edgeSecond.join();
 }

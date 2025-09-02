@@ -119,3 +119,13 @@ bool IDAStar::solve(Cube root, std::vector<Move>& movePath) const {
         bound = t.nextThreshold;
     }
 }
+
+void IDAStar::solveScramble(int n, MoveList& scramble, MoveList& solve) const {
+    scramble.clear(); solve.clear();
+    Cube c = Cube();
+    scramble = c.genScramble(n);
+    c.doMoves(scramble);
+    this->solve(c, solve);
+    c.doMoves(solve);
+    if (!c.is_solved()) throw std::runtime_error("Error with solver.");
+}

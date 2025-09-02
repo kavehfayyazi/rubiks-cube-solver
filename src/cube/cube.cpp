@@ -60,12 +60,12 @@ uint64_t Cube::encodeCorners() const { return cpNum(cp) * NUM_CORNER_ORIENTATION
 uint64_t Cube::encodeFirstEdges() const {
     return
             (epRank(ep, edgesFirstHalf) * NUM_EDGE_PERMUTATIONS + epNum(ep, edgesFirstHalf)) * // permutation numbering
-            NUM_EDGE_ORIENTATIONS + eoNumHalf(eo, edgesFirstHalf);
+            NUM_EDGE_ORIENTATIONS + eoNumHalf(ep, eo, edgesFirstHalf);
 }
 uint64_t Cube::encodeSecondEdges() const {
     return
             (epRank(ep, edgesSecondHalf) * NUM_EDGE_PERMUTATIONS + epNum(ep, edgesSecondHalf)) * // permutation numbering
-            NUM_EDGE_ORIENTATIONS + eoNumHalf(eo, edgesSecondHalf);
+            NUM_EDGE_ORIENTATIONS + eoNumHalf(ep, eo, edgesSecondHalf);
 }
 
 void Cube::doMove(Move m) {

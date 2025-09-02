@@ -7,7 +7,7 @@
 
 #include <string>
 
-void pdbgen(std::string fileName, bool forCorners, bool forFirstEdges);
+void pdbgen(std::string fileName, bool forCorners=true, bool forFirstEdges=true);
 void run_pdbgen();
 
 #endif //RUBIKSCUBESOLVER_PDBGEN_API_H

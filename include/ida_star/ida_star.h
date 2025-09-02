@@ -11,6 +11,8 @@
 #include "cube.h"
 #include "pdb_handler.h"
 
+using MoveList = std::vector<Move>;
+
 struct Result {
     bool found;
     size_t nextThreshold; // if found==false
@@ -26,6 +28,7 @@ public:
 public:
     IDAStar();
     bool solve(Cube root, std::vector<Move>& moveSolution) const;
+    void solveScramble(int n, MoveList& scramble, MoveList& solve) const;
 
 private:
     PdbHandler corner;

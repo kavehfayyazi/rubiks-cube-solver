@@ -6,7 +6,7 @@
 #include "pdb_constants.h"
 #include "cube.h"
 
-void pdbgen(std::string fileName, bool forCorners=true, bool forFirstEdges=true) {
+void pdbgen(std::string fileName, bool forCorners, bool forFirstEdges) {
     PdbHandler pdb = PdbHandler(fileName);
 
     uint64_t len = (forCorners) ? CORNER_PDB_BYTES : EDGE_PDB_BYTES;
@@ -48,9 +48,6 @@ void pdbgen(std::string fileName, bool forCorners=true, bool forFirstEdges=true)
 }
 
 void run_pdbgen() {
-    std::vector<uint8_t> cornerPDB(     CORNER_PDB_BYTES, 0xFF);
-    std::vector<uint8_t> startEdgePDB(  EDGE_PDB_BYTES  , 0xFF);
-    std::vector<uint8_t> endEdgePDB(    EDGE_PDB_BYTES  , 0xFF);
     std::thread corner([&]() {      pdbgen(PDB_CORNER_FILENAME); });
     std::thread edgeFirst([&]() {   pdbgen(PDB_EDGE_FIRST_FILENAME, false, true); });
     std::thread edgeSecond([&]() {  pdbgen(PDB_EDGE_SECOND_FILENAME, false, false); });

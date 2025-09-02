@@ -6,8 +6,9 @@
 #define RUBIKSCUBESOLVER_MAXDEPTHS_API_H
 
 #include <cstdint>
+#include <string>
 
-uint8_t findMaxDepth(bool isCorner=true, bool isEdgeFirst=true);
+void printMaxDepth(const std::string& start, bool isCorner=true, bool isEdgeFirst=true);
 void printMaxDepths();
 
 #endif //RUBIKSCUBESOLVER_MAXDEPTHS_API_H
