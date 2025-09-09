@@ -42,6 +42,7 @@ extern const std::array<std::array<uint8_t, EDGES_N>,   MOVE_N> ep_;
 extern const std::array<std::array<uint8_t, EDGES_N>,   MOVE_N> eo_;
 
 extern const std::unordered_map<Move, std::string> MOVE_TO_STRING;
+extern const std::unordered_map<std::string, Move> STRING_TO_MOVE;
 
 // Small helpers that depend on arrays above
 uint8_t face(Move a);

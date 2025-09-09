@@ -122,6 +122,15 @@ const std::unordered_map<Move, std::string> MOVE_TO_STRING = {
 /* B  */ {B,  "B"}, {B2, "B2"}, {B_PRIME, "B'"},
 };
 
+const std::unordered_map<std::string, Move> STRING_TO_MOVE = {
+/* U  */ {"U",  U}, {"U2", U2}, {"U'", U_PRIME},
+/* D  */ {"D",  D}, {"D2", D2}, {"D'", D_PRIME},
+/* L  */ {"L",  L}, {"L2", L2}, {"L'", L_PRIME},
+/* R  */ {"R",  R}, {"R2", R2}, {"R'", R_PRIME},
+/* F  */ {"F",  F}, {"F2", F2}, {"F'", F_PRIME},
+/* B  */ {"B",  B}, {"B2", B2}, {"B'", B_PRIME},
+};
+
 uint8_t face(Move a) { return FACES[a]; }
 bool isSameFace(Move a, Move b) { return FACES[a] == FACES[b]; }
 bool isOpposingFace(Move a, Move b) { return FACES[a] == OPPOSING_FACES[b] || FACES[b] == OPPOSING_FACES[a]; }

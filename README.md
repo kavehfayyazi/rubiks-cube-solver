@@ -4,9 +4,12 @@ A fast, modern C++20 Rubik's Cube solver centered on IDA* search and compact pat
 
 ## TL;DR
 
-```console
+```bash
 # Run interactive CLI
 ./build/tools/cli/cli
+
+rcs> new
+Created a new solved cube
 rcs> generate
 Generating pattern databases...
 Generation complete.
@@ -44,11 +47,14 @@ mkdir pdb # if pdb/ does not exist at root
 
 #### Commands (subject to change):
 
-* `help` — list commands
+* `help` — show this help
 * `generate` — build pattern databases
-* `scramble <N>` — generate N-move scramble and solve
+* `new` - create/reset a solved cube
+* `move <M1 M2 ...>` apply one or more moves
+* `scramble <N>` — apply N random moves and print scramble
+* `solve` print a solution for current cube
 * `maxdepths` — print max depths for piece groups
-* `exit | quit | q` — exit
+* `exit | quit | q` — leave the program
 
 ### Generate pattern databases
 
