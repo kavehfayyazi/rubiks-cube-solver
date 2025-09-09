@@ -4,50 +4,98 @@
 
 #include "ida_star.h"
 
+static inline uint8_t ceil_div(uint8_t x, uint8_t d) { return (uint8_t)((x + d - 1) / d); }
+
+static inline uint8_t combineH(uint8_t c, uint8_t e1, uint8_t e2) {
+    uint8_t h1 = std::max({c, e1, e2});
+    uint8_t h2 = std::max(ceil_div((uint8_t)(e1 + e2), 2),
+                          std::max(ceil_div((uint8_t)(c + e1), 2),
+                                   ceil_div((uint8_t)(c + e2), 2)));
+    uint8_t h3 = ceil_div((uint8_t)(c + e1 + e2), 3);
+    return std::max(h1, std::max(h2, h3));
+}
+
 uint8_t IDAStar::calculateHeuristic(const Cube& c) const {
     unsigned char cH  = corner.getPDBVal(c.encodeCorners());
     unsigned char e1H = edgeStart.getPDBVal(c.encodeFirstEdges());
     unsigned char e2H = edgeEnd.getPDBVal(c.encodeSecondEdges());
-    return cH + e1H + e2H;
+    return combineH(cH, e1H, e2H);
 }
 
 // returns false if f (g + h) > bound. calculates f in place
 bool IDAStar::multiLevelHeuristic(const Cube& c, size_t& f, const size_t& g, const size_t bound) const {
-    size_t h = corner.getPDBVal(c.encodeCorners());
-    f = g + h; if (f > bound) return false;
-
-    h += edgeEnd.getPDBVal(c.encodeSecondEdges());
-    f = g + h; if (f > bound) return false;
-
-    h += edgeStart.getPDBVal(c.encodeFirstEdges());
-    f = g + h; if (f > bound) return false;
-    return true;
+    uint8_t cH  = corner.getPDBVal(c.encodeCorners());
+    uint8_t e1H = edgeStart.getPDBVal(c.encodeFirstEdges());
+    uint8_t e2H = edgeEnd.getPDBVal(c.encodeSecondEdges());
+    size_t h = combineH(cH, e1H, e2H);
+    f = g + h;
+    return f <= bound;
 }
 
-Result IDAStar::search(Cube& cube, std::vector<Move>& movePath, size_t g, size_t bound, Move last, Move last2) const {
+Result IDAStar::search(Cube& cube, std::vector<Move>& movePath, size_t g, size_t bound, Move last, Move last2, std::unordered_map<uint64_t, TTEntry>* tt) const {
     if (cube.is_solved()) return Result{true, 0};
 
     size_t f = 0;
     if (!multiLevelHeuristic(cube, f, g, bound)) return Result{false, f};
 
+    // full state hash
+    auto mix64 = [](uint64_t x){
+        x += 0x9e3779b97f4a7c15ULL;
+        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9ULL;
+        x = (x ^ (x >> 27)) * 0x94d049bb133111ebULL;
+        return x ^ (x >> 31);
+    };
+    const uint64_t kc = mix64(cube.encodeCorners());
+    const uint64_t k1 = mix64(cube.encodeFirstEdges());
+    const uint64_t k2 = mix64(cube.encodeSecondEdges());
+    uint64_t key = kc ^ (k1 * 0x9e3779b97f4a7c15ULL) ^ (k2 * 0xbf58476d1ce4e5b9ULL);
+
+    auto it = tt->find(key);
+    if (it != tt->end() && g >= it->second.best_g) {
+        return Result{false, SIZE_MAX}; // dominated: we’ve seen as good or better
+    }
+    (*tt)[key] = TTEntry{(uint16_t)g};
+
     size_t minNextThreshold = SIZE_MAX;
 
-    for (Move m : MOVES) {
-        if (last != MOVE_N && isSameFace(m, last)) continue; // skip same face moves (includes inverse)
+    // Build & sort children by heuristic
+    struct Child { Move m; uint8_t h; };
+    Child kids[18]; int k = 0;
 
-        // Skip A B A where B is opposite face of A (e.g., R L R)
+    for (Move m : MOVES) {
+        if (last != MOVE_N && isSameFace(m, last)) continue;
         if (last2 != MOVE_N && isSameFace(m, last2) && isOpposingFace(m, last)) continue;
 
         cube.doMove(m);
-        movePath.push_back(m);
+        uint8_t hChild = combineH(
+                corner.getPDBVal(cube.encodeCorners()),
+                edgeStart.getPDBVal(cube.encodeFirstEdges()),
+                edgeEnd.getPDBVal(cube.encodeSecondEdges())
+        );
+        cube.undoMove(m);
+        kids[k++] = {m, hChild};
+    }
 
-        Result t = search(cube, movePath, g + 1, bound, m, last);
+    std::sort(kids, kids + k, [](const Child& a, const Child& b){ return a.h < b.h; });
+
+    for (int i = 0; i < k; ++i) {
+        Move m = kids[i].m;
+        const size_t child_f = (g + 1) + kids[i].h;   // h is max(C,E1,E2) for the child
+
+        if (child_f > bound) {                        // PRE-PRUNE: don’t recurse
+            minNextThreshold = std::min(minNextThreshold, child_f);
+            continue;
+        }
+
+        cube.doMove(m);
+        movePath.push_back(m);
+        Result t = search(cube, movePath, g + 1, bound, m, last, tt);
         if (t.found) return Result{true, 0};
         minNextThreshold = std::min(minNextThreshold, t.nextThreshold);
-
         cube.undoMove(m);
         movePath.pop_back();
     }
+
     return Result{false, minNextThreshold};
 }
 #include <iostream>
@@ -110,7 +158,8 @@ bool IDAStar::solve(Cube root, std::vector<Move>& movePath) const {
     size_t bound = calculateHeuristic(root);
     while (true) {
         movePath.clear(); // reset for this IDA* iteration
-        Result t = search(root, movePath, 0, bound);
+        std::unordered_map<uint64_t, TTEntry> tt;
+        Result t = search(root, movePath, 0, bound, MOVE_N, MOVE_N, &tt);
         if (t.found) {
             condenseMoves(movePath);
             return true;
