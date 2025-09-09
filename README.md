@@ -58,7 +58,7 @@ mkdir pdb # if pdb/ does not exist at root
 
 ### Generate pattern databases
 
-PDBs are not committed. Generate them once locally in the `rcs>` CLI using the `generate` command. (This step can be slow—on the order of tens of minutes depending on hardware.)
+PDBs are not committed. Generate them once locally in the `rcs>` CLI using the `generate` command. (This step can be slow—on the order of tens of minutes depending on hardware.) Approx sizes: corner ≈ 44.1 MB, each 6-edge PDB ≈ 21.3 MB (total ≈ 86.7 MB), stored under pdb/.
 
 ## Project Structure
 
